@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShiftMate</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="task-manager">
+      <!-- left bar starts -->
+      <div class="left-bar">
+        <div class="upper-part">
+          <div class="actions">
+            <!--<div class="circle"></div> -->
+           <!-- <div class="circle-2"></div> -->
+          </div>
+        </div>
+
+        <!-- left content starts -->
+        <div class="left-content">
+          <ul class="action-list">
+            <li class="item">
+              <img class="feather feather-inbox" src="svg/inbox.svg" alt="" />
+              <span>Inbox</span>
+            </li>
+            <!--<li class="item">
+              <img class="feather feather-profile" src="C:\Users\S549475\OneDrive - nwmissouri.edu\Documents\bearcatplanners\svg" alt="" />
+              <span>Profile</span>
+            </li>-->
+            <li class="item">
+              <img class="feather feather-star"style=image-size: "5px"; src="svg/star.svg" alt="" />
+              <span> Today</span>
+            </li>
+            <li class="item">
+              <img class="feather feather-calendar" src="svg/calender.svg" alt="" />
+              <span>Upcoming</span>
+            </li>
+            <li class="item">
+              <img class="feather feather-hash" src="svg/hash.svg" alt="" />
+              <span>Important</span>
+            </li>
+            <li class="item">
+              <img class="feather feather-users" src="svg/users.svg" alt="" />
+              <span>Meetings</span>
+            </li>
+            
+          </ul>
+
+          <ul class="category-list">
+            <li class="item">
+              <img class="feather feather-users" src="svg/profile.svg" alt="" />
+              <!--<span>My Profile</span>-->
+              <a href="profile.html" target="_blank">Profile</a>
+
+            </li>
+            <li class="item">
+              <img class="feather feather-sun" src="svg/create.svg" alt="" />
+              <!--<span>Create</span>-->
+              <a href="create.html" target="_blank">Notifications</a>
+            </li>
+            <li class="item">
+              <img class="feather feather-trending-up" src="svg/edit.svg" alt="" />
+              <!--<span>Edit</span>-->
+              <a href="edit.html" target="_blank">Documents</a>
+
+            </li>
+            <li class="item">
+              <img class="feather feather-zap" src="svg/delete.svg" alt="" />
+              <!--<span>Delete</span>-->
+              <a href="delete.html" target="_blank">Help</a>
+
+            </li>
+          </ul>
+        </div>
+        <!-- left content ends -->
+      </div>
+      <!--  -->
+      <!-- left bar ends -->
+      
+     
+    
+    
+      <html>
+          <title>Documents</title>
+          <style>
+               body {
+            font-size: medium;
+          }
+
+          .centered-div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+          </style>
+          
+        
+      <body>
+      
+        <div class="one centered-div" >
+          <h1>Welcome to shiftmate</h1>
+          <h5>Show File-select Fields</h5>
+              <p>Show a file-select field which allows
+              only one file to be chosen:</p>
+        <form action="/action_page.php" 
+              enctype="multipart/form-data">
+                
+              <label for="myfile">Select a file:</label>
+              <input type="file" id="myfile" name="myfile" />
+              <br /><br />
+              <input type="submit" />
+          </form>
+          </div>
+      </body>
+        
+      </html>
+
+     
+        
+        
+      <!-- right bar ends -->
+    
+    <div class="right-bar">
+      <div class="top-part">
+        <img class="feather feather-users" src="svg/users.svg" alt="" />
+        <img class="feather feather-users" src="svg/settings.svg" alt="" />
+
+        <div class="settings"></div>
+      </div>
+      <div class="row">
+        <div class="left" style="background-color:#bbb;">
+            
+          <input type="text" id="mySearch" onkeyup="myFunction()" placeholder="Search Employee.." title="Type in a category">
+          
+        </div>
+       </div>
+  </body>
+</html>
+
+<script>
+  function myFunction() {
+    var input, filter, ul, li, a, i;
+    input = document.getElementById("mySearch");
+    filter = input.value.toUpperCase()
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+      a = li[i].getElementsByTagName("a")[0];
+      if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+  
+
