@@ -49,6 +49,8 @@ class Home extends CI_Controller {
 		$mobile_number = $this->input->post('mobile_number');
 		$password = $this->input->post('password');
 		$cpassword = $this->input->post('cpassword');
+		$class_start_time = $this->input->post('class_start_time');
+		$class_end_time = $this->input->post('class_end_time');
 		
 		if($password !== $cpassword){
 			echo json_encode(["status"=>400, "message"=>"Password & Confirm Password Not Matched."]);
@@ -65,7 +67,8 @@ class Home extends CI_Controller {
 			"first_name" => $first_name,
 			"last_name" => $last_name,
 			"email" => $email,
-			"mobile" => $mobile_number,
+			/* "class_start_time" => $class_start_time,
+			"class_end_time" => $class_end_time, */
 			"password" => $this->secure->encrypt($password),
 			"created_date" => date("Y-m-d H:i:s")
 		];
@@ -108,7 +111,7 @@ class Home extends CI_Controller {
 			$cpass = $this->secure->decrypt($pchk->password);
 		
 			if($cpass == $password){
-				$this->session->set_userdata(["user_id"=>$pchk->id,"user_name"=>$pchk->first_name." ".$pchk->last_name, "role" => $pchk->role]);
+				$this->session->set_userdata(["user_id"=>$pchk->id,"user_name"=>$pchk->first_name." ".$pchk->last_name, "role" => $pchk->role, "email"=>$email]);
 				echo json_encode(["status"=>200,"message"=>"Logged in successfully."]);
 				exit;
 			}else{

@@ -2,31 +2,48 @@
   $this->load->view('includes/header')
 ?>
 
-<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
     <!-- page content starts -->
     <div class="page-content">
-      <div class="header">Schedules <a class="float-right btn btn-primary btn-sm" href="<? echo base_url('dashboard/createSchedule') ?>">Create Schedule</a></div>
-      <div class="container" style="margin-top:20px;">
+      <? if($this->session->userdata('role') == 'admin'){ ?>  
+        <div class="header">Schedules <a class="float-right btn btn-primary btn-sm" href="<? echo base_url('dashboard/createSchedule') ?>">Create Schedule <i class="fa fa-plus" style="font-weight: bold;"></i></a></div>
+      <? }else{ ?>  
+        <div class="header">My Schedules</div>
+      <? } ?>  
+      <div class="" style="margin-top:20px;">
         <div class="table-responsive">
           <table id="example" class="display" style="width:100%;">
             <thead>
                 <tr>
                     <th>Station</th>
-                    <th>Employee</th>
+                    <? if($this->session->userdata('role') == 'admin'){ ?>
+                      <th>Employee</th>
+                    <? } ?>  
                     <th>Start Time</th>
                     <th>End Time</th>
+                    <th>No'of Work Hours</th>
                 </tr>
             </thead>
             <tbody>
-              <? $schedules = $this->db->order_by("id","desc")->get_where("tbl_schedules")->result(); 
+              <? 
+                if($this->session->userdata('role') == 'employee'){
+                  $this->db->where("employee_id", $this->session->userdata('user_id'));
+                }
+                $schedules = $this->db->order_by("id","desc")->get_where("tbl_schedules")->result(); 
                  foreach($schedules as $k => $u){
                   $edata = $this->db->get_where('tbl_users', ['role'=>'employee','id'=>$u->employee_id])->row();
+
+                  $time1 = date("H:i:s", strtotime($u->start_time));
+                  $time2 = date("H:i:s", strtotime($u->end_time));
+                  
               ?>
                 <tr>
                     <td><? echo $u->station ?></td>
-                    <td><? echo $edata->first_name." ".$edata->last_name ?></td>
-                    <td><? echo $u->start_time ?></td>
-                    <td><? echo $u->end_time ?></td>
+                    <? if($this->session->userdata('role') == 'admin'){ ?>
+                      <td><? echo $edata->first_name." ".$edata->last_name ?></td>
+                    <? } ?>  
+                    <td><? echo date("d-m-Y h:i A", strtotime($u->start_time)) ?></td>
+                    <td><? echo date("d-m-Y h:i A", strtotime($u->end_time)) ?></td>
+                    <td><? echo ($time2-$time1)." hrs" ?></td>
                 </tr>
               <? } ?>  
             </tbody>
@@ -36,14 +53,11 @@
     </div>
     <!--  -->
     <!-- page content ends -->
-
     
 <?php
   $this->load->view('includes/footer')
 ?>
 
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
   $(document).ready(function(){

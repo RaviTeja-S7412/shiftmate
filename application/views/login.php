@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="<? echo base_url('assets/css/') ?>style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <title>ShiftMate | Login & Registration</title>
 </head>
 
@@ -73,7 +76,7 @@
             </div>
 
             <!------------------- registration form -------------------------->
-            <div class="register-container" id="register">
+            <div class="register-container" id="register" style="display: none;">
                 <form id="signup_form" method="post">
                     <div class="top">
                         <header>Sign Up</header>
@@ -93,10 +96,6 @@
                         <i class="bx bx-envelope"></i>
                     </div>
                     <div class="input-box">
-                        <input type="number" class="input-field" placeholder="Mobile Number" name="mobile_number" required>
-                        <i class="bx bx-envelope"></i>
-                    </div>
-                    <div class="input-box">
                         <input type="password" class="input-field" placeholder="Password" name="password" required>
                         <i class="bx bx-lock-alt"></i>
                     </div>
@@ -104,6 +103,18 @@
                         <input type="password" class="input-field" placeholder="Confirm Password" name="cpassword" required>
                         <i class="bx bx-lock-alt"></i>
                     </div>
+                    <!-- <hr />
+                    <p  style="color: white; text-align: center"><label><strong>Class Timings</strong></label></p>
+                    <div class="row" style="display: flex; margin-bottom: 10px;">
+                        <div class="input-box" style="width: 49%; margin-right: 10px">
+                            <label style="color: white">Start Time</label>
+                            <input type="time" class="input-field" name="class_start_time" required>
+                        </div>
+                        <div class="input-box" style="width: 50%;">
+                            <label style="color: white">End Time</label>
+                            <input type="time" class="input-field" name="class_end_time" required>
+                        </div>
+                    </div> -->
 
 
                     <!-- <div class="input-box" style="color:white;font-weight:bold;text-align: center; margin-bottom:10px;">
@@ -165,6 +176,8 @@
             b.className = "btn";
             x.style.opacity = 1;
             y.style.opacity = 0;
+            $("#login").show();
+            $("#register").hide();
         }
 
         function register() {
@@ -174,6 +187,8 @@
             b.className += " white-btn";
             x.style.opacity = 0;
             y.style.opacity = 1;
+            $("#login").hide();
+            $("#register").show();
         }
     </script>
 
@@ -229,6 +244,7 @@
             "data": fdata,
             "dataType": 'json',
             "success": function(data) {
+                console.log(data);
                 if (data.status == 200) {
                     Swal.fire(
                         'Success',

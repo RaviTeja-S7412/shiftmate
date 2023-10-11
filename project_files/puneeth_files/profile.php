@@ -1,13 +1,13 @@
 
 <?php
-include "config/config.php";
-session_start();
+// include "config/config.php";
+// session_start();
 
-if (!isset($_SESSION['user'])) {
-	session_destroy();
-  header("location: signup.php");
-  die();
-}
+// if (!isset($_SESSION['user'])) {
+// 	session_destroy();
+//   header("location: signup.php");
+//   die();
+// }
 ?>
 
 

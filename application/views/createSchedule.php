@@ -2,12 +2,20 @@
   $this->load->view('includes/header')
 ?>
 
-<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<style>
+.fc-timegrid-slot {
+    height: 35px !important
+}
+.fc-v-event .fc-event-title-container:hover{
+  background-color: lightblue;
+}
+</style>
+
     <!-- page content starts -->
     <div class="page-content">
       <div class="header">Create Schedule </div>
-      <div class="container" style="margin-top:20px;overflow: auto">
-        <div class="row mb-2">
+      <div class="" style="margin-top:20px;overflow: auto">
+        <div class="row mb-4">
           <div class="col-md-4">
             <label>Station</label>
             <select class="form-control" id="station">
@@ -21,19 +29,33 @@
             <label>Employees</label>
             <select class="form-control" id="employees">
               <option value="">Select Employee</option>
-              <? $users = $this->db->order_by("id","desc")->get_where("tbl_users", ["role"=>"employee", "status"=>"Active"])->result(); 
-                 foreach($users as $k => $u){
+              <!-- <? //$users = $this->db->order_by("id","desc")->get_where("tbl_users", ["role"=>"employee", "status"=>"Active"])->result(); 
+                 //foreach($users as $k => $u){
               ?>
-                <option value="<? echo $u->id ?>"><? echo $u->first_name." ".$u->last_name ?></option>
-              <? } ?>  
+                <option value="<? //echo $u->id ?>"><? //echo $u->first_name." ".$u->last_name ?></option>
+              <? //} ?> -->  
             </select>
           </div>
+          <div class="col-md-4" style="margin-top: 25px;">
+            <button type="button" class="btn btn-primary" onclick="addSchedule()">Submit</button>
+          </div>
         </div>
-        <div id='calendar'></div>
+
+        <div class="row">
+          <div class="col-md-11">
+            <div id='calendar'></div>     
+          </div>
+<!--           <div class="col-md-3">
+            <div></div>     
+          </div>       -->
+        </div>
+        
       </div>
     </div>
     <!--  -->
     <!-- page content ends -->
+    <input type="hidden" name="stime" id="stime">
+    <input type="hidden" name="etime" id="etime">
 
     
 <?php
@@ -73,6 +95,9 @@
       headerToolbar: { center: 'dayGridMonth,timeGridWeek,listWeek' },
       initialView: 'timeGridWeek',
       selectable: true,
+      slotMinTime: '06:00:00',
+      slotMaxTime: '24:00:00',
+      height:"350px",
       slotDuration: {
         "hours": 1
       },
@@ -84,7 +109,37 @@
         var start_time = convert(stime)+" "+stime.toString().split(" ")[4];
         var end_time = convert(etime)+" "+etime.toString().split(" ")[4];
 
-        addSchedule(start_time, end_time);
+        $("#stime").val(start_time);
+        $("#etime").val(end_time);
+
+        var station = $("#station").val();
+        var day = info.start.toString().split(" ")[0];
+        
+        if(station == ""){
+          Swal.fire(
+              'Error',
+              'Please Select Station',
+              'error'
+          )
+          return false;
+        }
+
+        $.ajax({
+          method: 'post',
+          url: "<? echo base_url('dashboard/getEmployees') ?>",
+          data: {'start_time': start_time, 'end_time': end_time, 'station': station, "day": day},
+          // dataType:'json',
+          success: function(data){
+            console.log(data);
+            $("#employees").html(data);
+          },
+          error: function(data){
+            console.log(data);
+          }
+        })
+
+
+        // addSchedule(start_time, end_time);
         /* calendar.addEvent({
           "title": "Demo event",
           start: info.start,
@@ -100,9 +155,11 @@
     calendar.render();
   });
 
-  function addSchedule(start_time, end_time){
+  function addSchedule(){
     var station = $("#station").val();
     var employees = $("#employees").val();
+    var start_time = $("#stime").val();
+    var end_time = $("#etime").val();
 
     if(station == ""){
       Swal.fire(
