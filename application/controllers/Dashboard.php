@@ -89,7 +89,7 @@ class Dashboard extends CI_Controller {
 
 		foreach($users as $k => $u){
 
-			$cCount = $this->db->get_where("tbl_employee_class_timings", ["employee_id"=>$u->id, 'day'=>$day]);
+			$cCount = $this->db->get_where("tbl_employee_class_timings", ["employee_id"=>$u->id]);
 
 			$sttime = date("H:i:s", strtotime($stime));
 			$ettime = date("H:i:s", strtotime($etime));
