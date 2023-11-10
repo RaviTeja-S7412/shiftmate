@@ -51,7 +51,7 @@
             <li class="item">
               <img class="feather feather-users" src="<? echo base_url('assets/') ?>svg/doc.jpg" alt="" />
               <!--<span>My Profile</span>-->
-              <a href="<? echo base_url('dashboard/mngrequests') ?>">Requests (Sub/Swap)</a>
+              <a href="<? echo base_url('dashboard/requests') ?>">Requests (Sub/Swap)</a>
             </li>
             <li class="item">
               <img class="feather feather-users" src="<? echo base_url('assets/') ?>svg/doc.jpg" alt="" />
@@ -82,7 +82,7 @@
               <li class="item">
                 <img class="feather feather-trending-up" src="<? echo base_url('assets/') ?>svg/delete.svg" alt="" />
                 <!--<span>Edit</span>-->
-                <a href="<? echo base_url('dashboard/adminrequests') ?>">Requests</a>
+                <a href="<? echo base_url('dashboard/requests') ?>">Requests</a>
 
               </li>
               <li class="item">

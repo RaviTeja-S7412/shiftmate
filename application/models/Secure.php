@@ -12,6 +12,41 @@ class Secure extends CI_Model
 		parent::__construct();
 	}
 
+	public function getEmployeeslist($stime, $etime, $station, $day, $eid='')
+	{
+
+		$html = '<option value="">Select Employee</option>';
+
+		if($eid){
+			$this->db->where("id !=", $eid);
+		}
+		$users = $this->db->order_by("id","desc")->get_where("tbl_users", ["station"=>$station])->result(); 
+
+		foreach($users as $k => $u){
+
+			$cCount = $this->db->get_where("tbl_employee_class_timings", ["employee_id"=>$u->id]);
+
+			$sttime = date("H:i:s", strtotime($stime));
+			$ettime = date("H:i:s", strtotime($etime));
+ 
+			$cTimings = $this->db->query("SELECT * FROM `tbl_employee_class_timings` WHERE `day` = '$day' AND `employee_id` = '$u->id' AND (`start_time` > '$sttime' AND `start_time` < '$ettime' OR `end_time` > '$sttime' AND `end_time` < '$ettime')");
+
+			$this->db->where("start_time <=", $sttime);
+			$this->db->where("end_time >=", $ettime);
+			$cTimings1 = $this->db->get_where("tbl_employee_class_timings", ["day"=>$day,"employee_id"=>$u->id]);
+			// if($cTimings1 == 0){
+			// 	$html .= '<option value="'.$u->id.'">'.$u->first_name." ".$u->last_name.'</option>';
+			// }
+
+			if($cCount->num_rows() > 0 && $cTimings->num_rows() == 0 && $cTimings1->num_rows() == 0){
+				$html .= '<option value="'.$u->id.'">'.$u->first_name." ".$u->last_name.'</option>';
+			}else{
+				
+			}
+		}
+		return $html;
+	}
+
 	public function generateCaptcha()
 	{
 
@@ -63,7 +98,6 @@ class Secure extends CI_Model
 			return false;
 		}
 	}
-
 
 	public function encryptWithKey($data, $key)
 	{

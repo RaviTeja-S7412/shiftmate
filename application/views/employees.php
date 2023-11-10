@@ -49,20 +49,22 @@ $this->load->view('includes/header')
                           <?
                           $days1 = ["Mon", "Tue", "Wed", "Thu", "Fri"];
                           foreach ($days1 as $d1) {
-                            $ct1 = $this->db->get_where("tbl_employee_class_timings", ["employee_id" => $u->id, "day" => $d1])->row();
+                            $ctimings1 = $this->db->get_where("tbl_employee_class_timings", ["employee_id" => $u->id, "day" => $d1])->result();
                           ?>
                             <div class="form-group" style="text-align: center;">
                               <label><? echo $d1 ?></label>
-                              <div class="row">
-                                <div class="col-md-6">
-                                  <label>Start Time</label>
-                                  <input type="time" class="form-control" readonly value="<? echo ($ct1->start_time !== '00:00:00') && ($ct1->start_time !== null) ? $ct1->start_time : '' ?>" />
+                              <? foreach($ctimings1 as $ct1){ ?>
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <label>Start Time</label>
+                                    <input type="time" class="form-control" readonly value="<? echo ($ct1->start_time !== '00:00:00') && ($ct1->start_time !== null) ? $ct1->start_time : '' ?>" />
+                                  </div>
+                                  <div class="col-md-6">
+                                    <label>End Time</label>
+                                    <input type="time" class="form-control" readonly value="<? echo ($ct1->end_time !== '00:00:00') && ($ct1->end_time !== null) ? $ct1->end_time : '' ?>" />
+                                  </div>
                                 </div>
-                                <div class="col-md-6">
-                                  <label>End Time</label>
-                                  <input type="time" class="form-control" readonly value="<? echo ($ct1->end_time !== '00:00:00') && ($ct1->end_time !== null) ? $ct1->end_time : '' ?>" />
-                                </div>
-                              </div>
+                              <? } ?>  
                             </div>
                           <? } ?>
                       </div>

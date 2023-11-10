@@ -56,7 +56,7 @@ class Dashboard extends CI_Controller {
 		$this->load->view('adminrequests');
 	}
 
-	public function emprequests()
+	public function requests()
 	{
 		$this->load->view('emprequests');
 	}
@@ -76,40 +76,47 @@ class Dashboard extends CI_Controller {
 		$this->load->view('createSchedule');
 	}
 	
+	public function getSchedules()
+	{
+
+		$color = 'blue';
+		$station = $this->input->post('station');
+		if($station == 'Mooyah'){
+			$color = MOOYAH;
+		}elseif($station == 'Dining'){
+			$color = DINING;
+		}elseif($station == 'Zen'){
+			$color = ZEN;
+		}
+
+		$sdata = [];                
+		$schedules = $this->db->get_where("tbl_schedules", ["station"=>$station])->result(); 
+		foreach($schedules as $s){
+			$edata = $this->db->get_where('tbl_users', ['role'=>'employee','id'=>$s->employee_id])->row();
+			$sdata[] = [
+				"title" => $edata->first_name." ".$edata->last_name,
+				"start" => $s->start_time,
+				"end" => $s->end_time,
+				"color" => $color
+			];
+		}
+
+		echo json_encode(["status"=>true, "sdata"=>$sdata]);
+		exit;
+
+	}
+	
 	public function getEmployees()
 	{
+
 		$stime = $this->input->post('start_time');
 		$etime = $this->input->post('end_time');
 		$station = $this->input->post('station');
 		$day = $this->input->post('day');
 
-		$html = '<option value="">Select Employee</option>';
-
-		$users = $this->db->order_by("id","desc")->get_where("tbl_users", ["station"=>$station])->result(); 
-
-		foreach($users as $k => $u){
-
-			$cCount = $this->db->get_where("tbl_employee_class_timings", ["employee_id"=>$u->id]);
-
-			$sttime = date("H:i:s", strtotime($stime));
-			$ettime = date("H:i:s", strtotime($etime));
- 
-			$cTimings = $this->db->query("SELECT * FROM `tbl_employee_class_timings` WHERE `day` = '$day' AND `employee_id` = '$u->id' AND (`start_time` > '$sttime' AND `start_time` < '$ettime' OR `end_time` > '$sttime' AND `end_time` < '$ettime')");
-
-			$this->db->where("start_time <=", $sttime);
-			$this->db->where("end_time >=", $sttime);
-			$cTimings1 = $this->db->get_where("tbl_employee_class_timings", ["day"=>$day,"employee_id"=>$u->id]);
-			// if($cTimings1 == 0){
-			// 	$html .= '<option value="'.$u->id.'">'.$u->first_name." ".$u->last_name.'</option>';
-			// }
-
-			if($cCount->num_rows() > 0 && $cTimings->num_rows() == 0 && $cTimings1->num_rows() == 0){
-				$html .= '<option value="'.$u->id.'">'.$u->first_name." ".$u->last_name.'</option>';
-			}else{
-				
-			}
-		}
+		$html = $this->secure->getEmployeeslist($stime, $etime, $station, $day);
 		echo $html;
+
 	}
 	
 	public function deleteEmployee($eid)
@@ -120,6 +127,7 @@ class Dashboard extends CI_Controller {
 		if($d){
 			$this->db->delete("tbl_schedules", ["employee_id"=>$eid]);
 			$this->db->delete("tbl_employee_class_timings", ["employee_id"=>$eid]);
+			$this->db->delete("tbl_documents", ["employee_id"=>$eid]);
 			echo json_encode(["status"=>true, "msg"=>"Successfully Deleted"]);
 			exit;
 		}else{
@@ -189,21 +197,21 @@ class Dashboard extends CI_Controller {
 
 		foreach($days as $d){
 
-			$stime = $this->input->post($d."startTime");
-			$etime = $this->input->post($d."endTime");
-
-			$count = $this->db->get_where("tbl_employee_class_timings", ["employee_id" => $eid, "day" => $d])->num_rows();
+			$stime = $this->input->post("starttime".$d);
+			$etime = $this->input->post("endtime".$d);
 			
-			$data = [
-				"employee_id" => $eid,
-				"day" => $d,
-				"start_time" => $stime,
-				"end_time" => $etime,
-			];
+			$delTimings = $this->db->delete("tbl_employee_class_timings", ["employee_id" => $eid, "day" => $d]);
+			
+			foreach($stime as $sk => $st){
+				$data = [
+					"employee_id" => $eid,
+					"day" => $d,
+					"start_time" => $st,
+					"end_time" => $etime[$sk],
+				];
 
-			if($count > 0){
-				$d1 = $this->db->where(["employee_id" => $eid, "day" => $d])->update("tbl_employee_class_timings", $data);
-			}else{
+				// print_r($data);
+
 				$d1 = $this->db->insert("tbl_employee_class_timings", $data);
 			}
 
@@ -216,6 +224,98 @@ class Dashboard extends CI_Controller {
 			echo json_encode(["status"=>false, "msg"=>"Error Occured"]);
 			exit;
 		}
+	}
+
+	public function insertRequest()
+	{
+		$user_id = $this->session->userdata('user_id');
+		$employee_id = $this->input->post('employee_id');
+		$schedule_id = $this->input->post('schedule_id');
+		$request_type = $this->input->post('request_type');
+		$empschedule_id = $this->input->post('empschedule_id');
+		
+		$data = ["schedule_id"=>$schedule_id,"request_type"=>$request_type,"created_by"=>$user_id];
+		if($request_type == "swap"){
+			$data["employee_id"] = $employee_id;
+			$data["empschedule_id"] = $empschedule_id;
+		}
+
+		$d = $this->db->insert("tbl_requests", $data);
+
+		if($d){
+			redirect('dashboard/requests');
+		}else{
+			redirect('dashboard/requests');
+		}
+
+	}
+
+	public function getSelectedemployeeschedules(){
+		$eid = $this->input->post('emp_id');
+		$this->db->where("employee_id", $eid);
+		$this->db->where("start_time >", date("Y-m-d H:i:s"));
+		$schedules = $this->db->order_by("id","desc")->get_where("tbl_schedules")->result(); 
+
+		$html = '<option value="">Select Employee Schedule</option>';
+		foreach($schedules as $k => $u1){
+			$chk = $this->db->get_where("tbl_requests",["schedule_id"=>$u1->id,"created_by"=>$eid])->num_rows();
+			if($chk == 0){
+				$html .= '<option value="'.$u1->id.'">'.date("m-d-Y", strtotime($u1->start_time))." (".date("h:iA", strtotime($u1->start_time))."-".date("h:iA", strtotime($u1->end_time)).")".'</option>';
+			}
+		} 
+		echo $html;
+	}
+
+	public function approveRequest($rid = ""){
+
+		$rsdata = $this->db->get_where("tbl_requests", ["id"=>$rid])->row();
+
+		if($rsdata->request_type == "swap"){
+
+			$this->db->where("id", $rsdata->schedule_id)->update("tbl_schedules", ["employee_id"=>$rsdata->employee_id]);
+			$this->db->where("id", $rsdata->empschedule_id)->update("tbl_schedules", ["employee_id"=>$rsdata->created_by]);
+
+			$this->db->where("id", $rid)->update('tbl_requests', ['status'=>'approved']);
+			redirect('dashboard/requests');
+
+		}else{
+
+			$this->db->where("id", $rsdata->schedule_id)->update("tbl_schedules", ["employee_id"=>$this->input->post('employee_id')]);
+			$this->db->where("id", $rid)->update('tbl_requests', ['status'=>'approved', 'employee_id'=>$this->input->post('employee_id')]);
+			redirect('dashboard/requests');
+
+		}
+
+	}
+
+	public function insertChat()
+	{
+		$user_id = $this->session->userdata('user_id');
+		$udata = $this->db->get_where('tbl_users',["id"=>$user_id])->row();
+		
+		$data = ["message_sent_by"=>$user_id,"message"=>$this->input->post('message')];
+		$d = $this->db->insert("tbl_chat", $data);
+
+		if($d){
+			echo json_encode(['status'=>true,'name'=>$udata->first_name]);
+		}else{
+			echo json_encode(['status'=>false]);
+		}
+
+	}
+
+	public function getLatestchat(){
+		$ccount = $this->input->post('last_count');
+		$mchat = $this->db->order_by('created_date', 'desc')->get_where('tbl_chat');
+		$cData = $mchat->row();
+
+		if(($mchat->num_rows() > $ccount) && ($cData->message_sent_by !== $this->session->userdata('user_id'))){
+			
+			$udata = $this->db->select('first_name')->get_where('tbl_users',['id'=>$cData->message_sent_by])->row();
+			echo json_encode(["status"=>true,"name"=> $udata->first_name, "message" => $cData->message, "ccount"=>$mchat->num_rows()]);
+			
+		}
+
 	}
 	
 }

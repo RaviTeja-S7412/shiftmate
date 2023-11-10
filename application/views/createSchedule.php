@@ -6,8 +6,12 @@
 .fc-timegrid-slot {
     height: 35px !important
 }
-.fc-v-event .fc-event-title-container:hover{
+/* .fc-v-event .fc-event-title-container:hover{
   background-color: lightblue;
+} */
+.fc-timegrid-event .fc-event-main:hover {
+    padding: 1px 1px 0px;
+    background-color: lightslategrey;
 }
 </style>
 
@@ -18,7 +22,7 @@
         <div class="row mb-4">
           <div class="col-md-4">
             <label>Station</label>
-            <select class="form-control" id="station">
+            <select class="form-control" id="station" onchange="changeStation()">
               <option value="">Select Station</option>
               <option value="Mooyah">Mooyah</option>
               <option value="Dining">Dining</option>
@@ -70,14 +74,25 @@
   $sdata = [];                
   $schedules = $this->db->get_where("tbl_schedules")->result(); 
   foreach($schedules as $s){
+
+    $color = 'blue';
+		$station = $s->station;
+		if($station == 'Mooyah'){
+			$color = MOOYAH;
+		}elseif($station == 'Dining'){
+			$color = DINING;
+		}elseif($station == 'Zen'){
+			$color = ZEN;
+		}
+    
     $edata = $this->db->get_where('tbl_users', ['role'=>'employee','id'=>$s->employee_id])->row();
     $sdata[] = [
       "title" => $edata->first_name." ".$edata->last_name,
       "start" => $s->start_time,
-      "end" => $s->end_time
+      "end" => $s->end_time,
+      "color" => $color
     ];
   }
-
 ?>
 
 <script>
@@ -89,7 +104,8 @@
     return [date.getFullYear(), mnth, day].join("-");
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
+  function loadCalender(cdata) {
+    console.log(cdata);
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
       headerToolbar: { center: 'dayGridMonth,timeGridWeek,listWeek' },
@@ -102,7 +118,7 @@
         "hours": 1
       },
       select: function(info) {
-
+        
         var stime = new Date(info.start);
         var etime = new Date(info.end);
 
@@ -150,10 +166,35 @@
       // dateClick: function() {
       //   alert('a day has been clicked!');
       // },
-      events: <? echo json_encode($sdata) ?>
+      events: cdata
     });
     calendar.render();
-  });
+  }
+
+  function changeStation(){
+    var station = $("#station").val();
+    if(station){
+      $.ajax({
+        method: 'post',
+        url: "<? echo base_url('dashboard/getSchedules') ?>",
+        data: {'station': station},
+        dataType:'json',
+        success: function(data){
+          if(data.status){
+            loadCalender(data.sdata);
+          }
+        },
+        error: function(){
+          
+        }
+      })
+    }
+  }
+
+  $(document).ready(function(){
+    var data = <? echo json_encode($sdata) ?>;
+    loadCalender(data);
+  })
 
   function addSchedule(){
     var station = $("#station").val();
